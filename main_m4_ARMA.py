@@ -50,7 +50,7 @@ if __name__ == "__main__":
     np.random.seed(0)
     torch.manual_seed(0)
     random.seed(0)
-    M4_index = 35
+    M4_index = 100
     # Load data
 
     ##########################
