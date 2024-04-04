@@ -39,6 +39,6 @@ Sample fature extraction code to extract label related feature if you need. It i
 
 # Parameter explanation
 --datasets to choose dataset. \n
---label_index to choose the index of the label in the csv of your dataset, usually the label is in the first or the last column.\n
---lr to choose learning rate.\n
---test_size to allocate the test from the whole dataset.\n
+--label_index to choose the index of the label in the csv of your dataset, usually the label is in the first or the last column. \n
+--lr to choose learning rate. \n
+--test_size to allocate the test from the whole dataset. \n
