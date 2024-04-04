@@ -7,7 +7,7 @@ Soft Decision Tree with ARMA features. The parameters are validated and the best
 - https://www.kaggle.com/datasets/sumanthvrao/daily-climate-time-series-data?select=DailyDelhiClimateTrain.csv
 - https://www.investing.com/currencies/hkd-usd-historical-data
 - https://www.kaggle.com/datasets/yogesh94/m4-forecasting-competition-dataset
-  explanation of the m4 dataset please go to https://paperswithcode.com/dataset/m4
+  explanation of the M4 dataset please go to https://paperswithcode.com/dataset/m4
 
 # Feature Extraction
 Sample fature extraction code to extract label related feature if you need. It is in feature_extraction.ipynb file
