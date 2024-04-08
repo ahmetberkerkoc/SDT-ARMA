@@ -38,7 +38,15 @@ Sample fature extraction code to extract label related feature if you need. It i
 ```
 
 # Parameter explanation
---datasets to choose dataset. <br />
---label_index to choose the index of the label in the csv of your dataset, usually the label is in the first or the last column. <br />
+--exp_name to give experiment name  <br />
+--data_path to choose dataset from any csv. <br />
+--label_name to understand the column name of the label in the csv of your dataset, default label name is y. <br />
+--test_size to allocate the test from the whole dataset as ratio. 0.3 means th3 30 % of the whole dataset  <br />
+--depth soft decision tree depth <br />
+--lamda to choose coefficient of the regularization term <br />
 --lr to choose learning rate. <br />
---test_size to allocate the test from the whole dataset. <br />
+--epochs to give number of training epochs <br />
+--date_column_name to understand whether there is date column or not to drop it before data converting to tensor <br />
+
+
+
