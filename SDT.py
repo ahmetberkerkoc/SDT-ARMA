@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F 
+import torch.nn.functional as F
+
 
 class SDT(nn.Module):
     """Fast implementation of soft decision tree in PyTorch.
@@ -42,13 +43,7 @@ class SDT(nn.Module):
       A `nn.Linear` module that simulates all leaf nodes in the tree.
     """
 
-    def __init__(
-            self,
-            input_dim,
-            output_dim,
-            depth=5,
-            lamda=1e-3,
-            use_cuda=False):
+    def __init__(self, input_dim, output_dim, depth=5, lamda=1e-3, use_cuda=False):
         super(SDT, self).__init__()
 
         self.input_dim = input_dim
@@ -60,13 +55,11 @@ class SDT(nn.Module):
 
         self._validate_parameters()
 
-        self.internal_node_num_ = 2 ** self.depth - 1
-        self.leaf_node_num_ = 2 ** self.depth
+        self.internal_node_num_ = 2**self.depth - 1
+        self.leaf_node_num_ = 2**self.depth
 
         # Different penalty coefficients for nodes in different layers
-        self.penalty_list = [
-            self.lamda * (2 ** (-depth)) for depth in range(0, self.depth)
-        ]
+        self.penalty_list = [self.lamda * (2 ** (-depth)) for depth in range(0, self.depth)]
 
         # Initialize internal nodes and leaf nodes, the input dimension on
         # internal nodes is added by 1, serving as the bias.
@@ -75,9 +68,7 @@ class SDT(nn.Module):
             nn.Sigmoid(),
         )
 
-        self.leaf_nodes = nn.Linear(self.leaf_node_num_,
-                                    self.output_dim,
-                                    bias=False)
+        self.leaf_nodes = nn.Linear(self.leaf_node_num_, self.output_dim, bias=False)
 
     def forward(self, X, is_training_data=False):
         _mu, _penalty = self._forward(X)
@@ -133,13 +124,11 @@ class SDT(nn.Module):
         penalty = torch.tensor(0.0).to(self.device)
 
         batch_size = _mu.size()[0]
-        _mu = _mu.view(batch_size, 2 ** layer_idx)
+        _mu = _mu.view(batch_size, 2**layer_idx)
         _path_prob = _path_prob.view(batch_size, 2 ** (layer_idx + 1))
 
         for node in range(0, 2 ** (layer_idx + 1)):
-            alpha = torch.sum(
-                _path_prob[:, node] * _mu[:, node // 2], dim=0
-            ) / torch.sum(_mu[:, node // 2], dim=0)
+            alpha = torch.sum(_path_prob[:, node] * _mu[:, node // 2], dim=0) / torch.sum(_mu[:, node // 2], dim=0)
 
             coeff = self.penalty_list[layer_idx]
 
@@ -159,16 +148,13 @@ class SDT(nn.Module):
     def _validate_parameters(self):
 
         if not self.depth > 0:
-            msg = ("The tree depth should be strictly positive, but got {}"
-                   "instead.")
+            msg = "The tree depth should be strictly positive, but got {}" "instead."
             raise ValueError(msg.format(self.depth))
 
         if not self.lamda >= 0:
-            msg = (
-                "The coefficient of the regularization term should not be"
-                " negative, but got {} instead."
-            )
+            msg = "The coefficient of the regularization term should not be" " negative, but got {} instead."
             raise ValueError(msg.format(self.lamda))
+
 
 class MLPModel(nn.Module):
     def __init__(
@@ -183,9 +169,9 @@ class MLPModel(nn.Module):
     def forward(self, x):
         x = x.view(x.size(0), -1)  # flatten
         x = self.fc11(x)
-        x = torch.sigmoid(x)
-        # x = F.relu(x)  # rectify become non linear
-        # x = self.fc2(x)
+        # x = torch.sigmoid(x)
+        x = F.relu(x)  # rectify become non linear
+        x = self.fc2(x)
         return x
 
         # x = x.view(x.size(0), -1)  # flatten
@@ -207,14 +193,14 @@ class MLPModel_deep(nn.Module):
 
     def forward(self, x):
         x = x.view(x.size(0), -1)  # flatten
-        # x = self.fc1(x)
-        # x = F.relu(x)  # x = F.relu(x)  # rectify become non linear
+        x = self.fc1(x)
+        x = F.relu(x)  # x = F.relu(x)  # rectify become non linear
         x = self.fc2(x)
         x = F.relu(x)
         x = self.fc3(x)
         x = F.relu(x)
-        #x = self.fc4(x)
-        #x = F.relu(x)
+        x = self.fc4(x)
+        x = F.relu(x)
         x = self.fc5(x)
         x = torch.sigmoid(x)
         return x
