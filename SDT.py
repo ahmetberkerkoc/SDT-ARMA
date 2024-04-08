@@ -178,7 +178,6 @@ class MLPModel(nn.Module):
         # x = self.fc11(x)
         # return x
 
-
 class MLPModel_deep(nn.Module):
     def __init__(
         self,
