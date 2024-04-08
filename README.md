@@ -51,3 +51,7 @@ Sample fature extraction code to extract label related feature if you need. It i
 # Comparision with Other Models
 If you want to run other state of the art models, you can use model_comparision.ipynb file
 
+# References
+For our base models soft decision tree implementation
+  https://github.com/xuyxu/Soft-Decision-Tree
+
