@@ -12,37 +12,116 @@ import random
 from torch.utils.data import TensorDataset, DataLoader
 import os
 import matplotlib.pyplot as plt
-
+import argparse
 
 def mape(y_test, pred):
     mape = np.mean(np.abs((y_test - pred) / y_test))
     return mape
 
 
-type_dic = {"Daily": 500, "Weekly": 251, "Hourly": 414}
-forecast_dic = {"Daily": 14, "Weekly": 13, "Hourly": 48}
-if __name__ == "__main__":
-    m4_type = "Weekly"
-    result_folder = f"Results/last_result_soft_ARMA_{m4_type}"
-    result_txt_file = f"m4_sdt_arma_{m4_type}.txt"
 
+if __name__ == "__main__":
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--exp_name",
+        type=str,
+        help="Data path for forecast",
+        default="experiment"
+    )
+    parser.add_argument(
+        "--data_path",
+        type=str,
+        help="Data path for forecast",
+        default="DailyDelhiClimate.csv"
+    )
+    parser.add_argument(
+        "--label_name",
+        type=str,
+        help="label name like y, target or etc",
+        default="y",
+    )
+    
+    parser.add_argument(
+        "--test_size",
+        type=float,
+        default=0.3,
+        help="Test size as portion")
+    
+    parser.add_argument(
+        "--depth",
+        type=int,
+        default=3,
+        help="Tree Depth")
+    
+    parser.add_argument(
+        "--lamda",
+        type=float,
+        default=1e-3,
+        help="coefficient of the regularization term")
+    parser.add_argument(
+        "--lr",
+        type=float,
+        default=1e-2,
+        help="learning rate")
+    
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=30,
+        help="The number of training epoch")
+    
+    parser.add_argument(
+        "--log_interval",
+        type=int,
+        default=100,
+        help="The number of batches to wait before printing logs")
+    
+    parser.add_argument(
+        "--date_column_name",
+        type=str,
+        help="whether there is date index",
+        default="date"
+       )
+    
+    args = parser.parse_args()
+    
+    
+    
+    exp_name = args.exp_name
+    data_path = args.data_path
+    label_name = args.label_name
+    test_size = args.test_size
+    date_column_name = args.date_column_name
+    
+    depth = args.depth  # tree depth
+    lamda = args.lamda  # coefficient of the regularization term
+    lr = args.lr  # learning rate
+    epochs = args.epochs  # the number of training epochs
+    log_interval = args.log_interval  # the number of batches to wait before printing logs
+    
+    
+    if not os.path.exists("Results"):
+        os.makedirs("Results")
+        
+    
+    result_folder = f"Results/sdt_arm_{exp_name}"
+    result_txt_file = f"sdt_arma_{exp_name}.txt"
+
+    
+    
+    
+    
     if not os.path.exists(result_folder):
         os.makedirs(result_folder)
 
-    # M4 Parameters
-    # M4_index = 103
-    forecast_horizon = forecast_dic[m4_type]
+
+    
     # Parameters
     # the number of input dimensions
     output_dim = 1  # the number of outputs (i.e., # classes on MNIST)
-    depth = 2  # tree depth
-    lamda = 1e-3  # coefficient of the regularization term
-    lr = 1e-2  # learning rate
-    weight_decaly = 5e-4  # weight decay
     batch_size = 1  # batch size
-    epochs = 20  # the number of training epochs
-    log_interval = 100  # the number of batches to wait before printing logs
-    use_cuda = True  # whether to use GPU
+    use_cuda = torch.cuda.is_available()  # whether to use GPU
 
     device = torch.device("cuda" if use_cuda else "cpu")
 
@@ -50,17 +129,29 @@ if __name__ == "__main__":
     np.random.seed(0)
     torch.manual_seed(0)
     random.seed(0)
-    M4_index = 100
+
     # Load data
 
     ##########################
 
     mu, sigma = 0, 0.1
     
-    df = pd.read_csv(f"Dataset/Extracted_M4/{M4_index}_M4_{m4_type}.csv")
+    df = pd.read_csv(data_path)
     df = df.drop("Unnamed: 0", axis=1)
-    y = df.loc[:, "y"]
+    if date_column_name is not None:
+        df = df.drop(date_column_name,axis=1)
+    col_list = list(df.columns)
+    col_list.remove(label_name)
+    col_list.insert(0,label_name)
+    
+    df = df[col_list]
+    
+    
+    y = df.loc[:, label_name]
     X = df.iloc[:, 1:]
+    data_len = len(X)
+    
+    forecast_horizon = int(data_len * test_size) 
     e_t = np.random.normal(mu, sigma, len(X))
 
     X["e"] = e_t
@@ -200,11 +291,11 @@ if __name__ == "__main__":
 
     plt.plot(target_list)
     plt.plot(output_list)
-    plt.savefig(f"{result_folder}/predictions_{M4_index}.png")
+    plt.savefig(f"{result_folder}/predictions_{exp_name}.png")
     plt.cla()
     f = open(f"{result_folder}/{result_txt_file}", "a+")
     f.write("########\n")
-    f.write(f"M4 index: {M4_index}\n")
+    f.write(f"M4 index: {exp_name}\n")
 
     f.write("Train Losses")
     f.write(str(train_losses) + "\n\n")
@@ -222,6 +313,6 @@ if __name__ == "__main__":
     plt.legend()
     plt.xlabel("Epochs")
     plt.ylabel("MSE Losses")
-    plt.savefig(f"{result_folder}/SDT_result_{M4_index}.png")
+    plt.savefig(f"{result_folder}/SDT_result_{exp_name}.png")
     plt.cla()
 
