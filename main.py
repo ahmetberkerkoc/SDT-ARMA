@@ -14,109 +14,47 @@ import os
 import matplotlib.pyplot as plt
 import argparse
 
+
 def mape(y_test, pred):
     mape = np.mean(np.abs((y_test - pred) / y_test))
     return mape
 
 
-
 if __name__ == "__main__":
-    
+
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--exp_name",
-        type=str,
-        help="Data path for forecast",
-        default="experiment"
-    )
-    parser.add_argument(
-        "--data_path",
-        type=str,
-        help="Data path for forecast",
-        default="DailyDelhiClimate.csv"
-    )
-    parser.add_argument(
-        "--label_name",
-        type=str,
-        help="label name like y, target or etc",
-        default="y",
-    )
-    
-    parser.add_argument(
-        "--test_size",
-        type=float,
-        default=0.3,
-        help="Test size as portion")
-    
-    parser.add_argument(
-        "--depth",
-        type=int,
-        default=3,
-        help="Tree Depth")
-    
-    parser.add_argument(
-        "--lamda",
-        type=float,
-        default=1e-3,
-        help="coefficient of the regularization term")
-    parser.add_argument(
-        "--lr",
-        type=float,
-        default=1e-2,
-        help="learning rate")
-    
-    parser.add_argument(
-        "--epochs",
-        type=int,
-        default=30,
-        help="The number of training epoch")
-    
-    parser.add_argument(
-        "--log_interval",
-        type=int,
-        default=100,
-        help="The number of batches to wait before printing logs")
-    
-    parser.add_argument(
-        "--date_column_name",
-        type=str,
-        help="whether there is date index",
-        default="date"
-       )
-    
+    parser.add_argument("--exp_name", type=str, help="Data path for forecast", default="experiment")
+    parser.add_argument("--data_path", type=str, help="Data path for forecast")
+    parser.add_argument("--label_name", type=str, help="label name like y, target or etc", default="y")
+    parser.add_argument("--test_size", type=float, default=0.3, help="Test size as portion")
+    parser.add_argument("--depth", type=int, default=3, help="Tree Depth")
+    parser.add_argument("--lamda", type=float, default=1e-3, help="coefficient of the regularization term")
+    parser.add_argument("--lr", type=float, default=1e-2, help="learning rate")
+    parser.add_argument("--epochs", type=int, default=30, help="The number of training epoch")
+    parser.add_argument("--date_column_name", type=str, help="whether there is date index", default=None)
+
     args = parser.parse_args()
-    
-    
-    
+
     exp_name = args.exp_name
     data_path = args.data_path
     label_name = args.label_name
     test_size = args.test_size
     date_column_name = args.date_column_name
-    
+
     depth = args.depth  # tree depth
     lamda = args.lamda  # coefficient of the regularization term
     lr = args.lr  # learning rate
     epochs = args.epochs  # the number of training epochs
-    log_interval = args.log_interval  # the number of batches to wait before printing logs
-    
-    
+
     if not os.path.exists("Results"):
         os.makedirs("Results")
-        
-    
+
     result_folder = f"Results/sdt_arm_{exp_name}"
     result_txt_file = f"sdt_arma_{exp_name}.txt"
 
-    
-    
-    
-    
     if not os.path.exists(result_folder):
         os.makedirs(result_folder)
 
-
-    
     # Parameters
     # the number of input dimensions
     output_dim = 1  # the number of outputs (i.e., # classes on MNIST)
@@ -135,23 +73,22 @@ if __name__ == "__main__":
     ##########################
 
     mu, sigma = 0, 0.1
-    
+
     df = pd.read_csv(data_path)
     df = df.drop("Unnamed: 0", axis=1)
     if date_column_name is not None:
-        df = df.drop(date_column_name,axis=1)
+        df = df.drop(date_column_name, axis=1)
     col_list = list(df.columns)
     col_list.remove(label_name)
-    col_list.insert(0,label_name)
-    
+    col_list.insert(0, label_name)
+
     df = df[col_list]
-    
-    
+
     y = df.loc[:, label_name]
     X = df.iloc[:, 1:]
     data_len = len(X)
-    
-    forecast_horizon = int(data_len * test_size) 
+
+    forecast_horizon = int(data_len * test_size)
     e_t = np.random.normal(mu, sigma, len(X))
 
     X["e"] = e_t
@@ -249,7 +186,6 @@ if __name__ == "__main__":
 
         train_losses.append((train_mse, train_mae, train_mape))
 
-        
         tree.eval()
         correct = 0.0
         output_list = []
@@ -315,4 +251,3 @@ if __name__ == "__main__":
     plt.ylabel("MSE Losses")
     plt.savefig(f"{result_folder}/SDT_result_{exp_name}.png")
     plt.cla()
-
