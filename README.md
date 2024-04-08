@@ -34,7 +34,7 @@ Sample fature extraction code to extract label related feature if you need. It i
 
 # To run the code
 ```bash
-  python main.py --datasets delhi --label_index --lr 0.3 --test_size 0.3 
+  python main.py --exp_name exp --data_path csv_data.csv  --label_name y --test_size 0.3 --depth 3 --lamda 1e-3 --lr 1e-2 --epochs 30 --date_column_name date
 ```
 
 # Parameter explanation
