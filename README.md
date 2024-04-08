@@ -48,5 +48,6 @@ Sample fature extraction code to extract label related feature if you need. It i
 --epochs to give number of training epochs <br />
 --date_column_name to understand whether there is date column or not to drop it before data converting to tensor <br />
 
-
+# Comparision with Other Models
+If you want to run other state of the art models, you can use model_comparision.ipynb file
 
