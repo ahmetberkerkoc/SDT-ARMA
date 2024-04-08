@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-
+import torch.nn.functional as F 
 
 class SDT(nn.Module):
     """Fast implementation of soft decision tree in PyTorch.
@@ -169,3 +169,83 @@ class SDT(nn.Module):
                 " negative, but got {} instead."
             )
             raise ValueError(msg.format(self.lamda))
+
+class MLPModel(nn.Module):
+    def __init__(
+        self,
+        input_dim,
+    ):
+        super(MLPModel, self).__init__()
+        self.fc1 = nn.Linear(input_dim, int(input_dim / 2))
+        self.fc2 = nn.Linear(int(input_dim / 2), 1)  # second linear layer
+        self.fc11 = nn.Linear(input_dim, 1)
+
+    def forward(self, x):
+        x = x.view(x.size(0), -1)  # flatten
+        x = self.fc11(x)
+        x = torch.sigmoid(x)
+        # x = F.relu(x)  # rectify become non linear
+        # x = self.fc2(x)
+        return x
+
+        # x = x.view(x.size(0), -1)  # flatten
+        # x = self.fc11(x)
+        # return x
+
+
+class MLPModel_deep(nn.Module):
+    def __init__(
+        self,
+        input_dim,
+    ):
+        super(MLPModel_deep, self).__init__()
+        self.fc1 = nn.Linear(input_dim, input_dim)
+        self.fc2 = nn.Linear(input_dim, int(input_dim / 2))
+        self.fc3 = nn.Linear(int(input_dim / 2), int(input_dim / 2))
+        self.fc4 = nn.Linear(int(input_dim / 2), int(input_dim / 2))
+        self.fc5 = nn.Linear(int(input_dim / 2), 1)
+
+    def forward(self, x):
+        x = x.view(x.size(0), -1)  # flatten
+        # x = self.fc1(x)
+        # x = F.relu(x)  # x = F.relu(x)  # rectify become non linear
+        x = self.fc2(x)
+        x = F.relu(x)
+        x = self.fc3(x)
+        x = F.relu(x)
+        #x = self.fc4(x)
+        #x = F.relu(x)
+        x = self.fc5(x)
+        x = torch.sigmoid(x)
+        return x
+
+
+class MLPModel_residual(nn.Module):
+    def __init__(
+        self,
+        input_dim,
+    ):
+        super(MLPModel_residual, self).__init__()
+        self.fc1 = nn.Linear(input_dim, input_dim)
+        self.fc2 = nn.Linear(input_dim, int(input_dim / 2))
+        self.fc3 = nn.Linear(int(input_dim / 2), int(input_dim / 2))
+        self.fc4 = nn.Linear(int(input_dim / 2), int(input_dim / 2))
+        self.fc5 = nn.Linear(int(input_dim / 2), 1)
+
+    def forward(self, x):
+        x = x.view(x.size(0), -1)  # flatten
+        # x = self.fc1(x)
+        # x = F.relu(x)  # x = F.relu(x)  # rectify become non linear
+        x = self.fc2(x)
+        x = F.relu(x)
+        out1 = x
+        x = self.fc3(x)
+        x = F.relu(x)
+        x = x + out1
+        out2 = x
+        x = self.fc4(x)
+        x = F.relu(x)
+        x = x + out2
+        x = self.fc5(x)
+        x = torch.sigmoid(x)
+        return x
