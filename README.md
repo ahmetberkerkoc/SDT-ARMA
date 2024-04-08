@@ -32,13 +32,21 @@ Soft Decision Tree with ARMA features. The parameters are validated and the best
 Sample fature extraction code to extract label related feature if you need. It is in feature_extraction.ipynb file
 
 
-# To run the code
+# To Run The Code
 ```bash
-  python main.py --datasets delhi --label_index --lr 0.3 --test_size 0.3 
+  python main.py --exp_name exp --data_path csv_data.csv  --label_name y --test_size 0.3 --depth 3 --lamda 1e-3 --lr 1e-2 --epochs 30 --date_column_name date
 ```
 
-# Parameter explanation
---datasets to choose dataset. <br />
---label_index to choose the index of the label in the csv of your dataset, usually the label is in the first or the last column. <br />
+# Parameter Explanation
+--exp_name to give experiment name  <br />
+--data_path to choose dataset from any csv. <br />
+--label_name to understand the column name of the label in the csv of your dataset, default label name is y. <br />
+--test_size to allocate the test from the whole dataset as ratio. 0.3 means th3 30 % of the whole dataset  <br />
+--depth soft decision tree depth <br />
+--lamda to choose coefficient of the regularization term <br />
 --lr to choose learning rate. <br />
---test_size to allocate the test from the whole dataset. <br />
+--epochs to give number of training epochs <br />
+--date_column_name to understand whether there is date column or not to drop it before data converting to tensor <br />
+
+
+
