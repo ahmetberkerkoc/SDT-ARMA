@@ -10,16 +10,16 @@ class SDT(nn.Module):
     input_dim : int
       The number of input dimensions.
     output_dim : int
-      The number of output dimensions. For example, for a multi-class
-      classification problem with `K` classes, it is set to `K`.
-    depth : int, default=5
+      The number of output dimensions. For example, for a regression,
+       it is set to 1.
+    depth : int, default=3
       The depth of the soft decision tree. Since the soft decision tree is
       a full binary tree, setting `depth` to a large value will drastically
       increases the training and evaluating cost.
     lamda : float, default=1e-3
       The coefficient of the regularization term in the training loss. Please
       refer to the paper on the formulation of the regularization term.
-    use_cuda : bool, default=False
+    use_cuda : bool, default=depend on gpu avaiablity
       When set to `True`, use GPU to fit the model. Training a soft decision
       tree using CPU could be faster considering the inherent data forwarding
       process.
